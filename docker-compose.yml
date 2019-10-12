@@ -1,0 +1,32 @@
+version: '3.1'
+
+services:
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./docker/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+      - ./docker/mysql/init/:/docker-entrypoint-initdb.d/
+    ports:
+      - 13306:3306
+    expose:
+      - 13306
+    
+  canal-server:
+    image: canal/canal-server:v1.1.4
+    container_name: canal-server
+    ports:
+      - "11111:11111"
+      - "11110:11110"
+    expose:
+      - 11110
+    volumes:
+      - ./docker/canal-server-logs/:/home/admin/canal-server/logs/
+      - ./docker/canal-conf/:/home/admin/canal-server/conf/example/
+    depends_on:
+      - mysql
